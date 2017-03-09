@@ -1,0 +1,19 @@
+Cruces de dos progenitores siguiendo leyes mendelianas. Con tantas características binarias. Mostrar descendientes posibles y la probabilidad de cada uno.
+
+I/O:
+	-Grabar archivos con datos para un problema ingresado. El archivo se puede guardar y abrir (cargando los datos del archivo).
+
+Características:
+	n: entre 1 y 29, cantidad de características a considerar.
+		Cada una es identificada por una sola letra del alfabeto.
+		-El usuario la puede digitar la letra que usará cada característica (puede escribir la mayúscula o la minúscula), mayúscula para dominante o minúscula para recesiva.
+			-Por defecto se usarán las letras en orden.
+		-Descripción de cada forma de la caractersística:
+			-Mayúscula: grande
+			-Minúscula: pequeño
+
+		Impedir que se usen algo diferente de letras, que se repita letras, etc. 
+
+
+Padres y madres:
+	Generar los genotipos posibles con las n características.
