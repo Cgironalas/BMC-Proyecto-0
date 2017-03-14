@@ -5,125 +5,99 @@
 #include <math.h>
 
 int n = 2;
-int alleles;
-int offspringAmount;
+int debug = 1;
+char caps[30] = {'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'};
+typedef struct{
+	char genotype;
+}offspring;
 
-//progenitor1 [Aa]
-//progenitor2 [Cc]
-	//		A 		a
-	//C 	AC 		aC
-	//c 	Ac 		ac
-
-//progenitor1 [AaBb]
-//progenitor2 [CcDd]
-	// 		AB 		Ab 		aB 		ab
-	//CD 	ABCD 	AbCD 	aBCD	abCD
-	//Cd 	ABCd 	AbCd 	aBCd 	abCd
-	//cD 	ABcD 	AbcD 	aBcD 	abcD
-	//cd 	ABcd 	Abcd 	aBcd 	abcd
 void cross(char* progenitor1, char* progenitor2){
 	int tableSide = pow(2, n);
-	int value = tableSide / 2;
+	int lettersPerIteration = tableSide / 2;
+
+	printf("Table side: %i\n", tableSide);
+	printf("lettersPerIteration: %i\n\n", lettersPerIteration);
 
 	char row[tableSide][n];
 	char col[tableSide][n];
-	int counter, iteration, counter1, letter;
-
-	for(letter = 0; letter < n; letter++){
-		iteration = 0;
-		counter1 = 0;
-		while(iteration < tableSide){
-			counter = 0;
-			while(counter < value){
-				row[iteration][letter] = progenitor1[(letter * 2) + counter1];
-				col[iteration][letter] = progenitor2[(letter * 2) + counter1];
-				iteration++;
-				counter++;
-			}
-			counter1++;
-			if(counter1 == n){
-				counter1 = 0;
-			}
-		}
-		value /= 2;	
-	}
-
-
-	printf("1: %s\n", progenitor1);
-	printf("2: %s\n", progenitor2);
-	printf("Cross:\n");
-	for(counter = 0; counter < tableSide; counter++){
-		printf("row: ");
-		printf("%c", row[counter][0]);
-		printf("%c\n", row[counter][1]);
-	}
-	for(counter = 0; counter < tableSide; counter++){
-		printf("column: ");
-		printf("%c", col[counter][0]);
-		printf("%c\n", col[counter][1]);
-	}
+	int counter, iteration, allele, letter;
 
 	char offspring[tableSide][tableSide][2 * n];
+
+
+	//Create rows and columns
+	for(letter = 0; letter < n; letter++){
+		printf("Letter: %i\n", letter);
+		iteration = 0;
+		allele = 0;
+		while(iteration < tableSide){
+			printf("\tIteration: %i\n", iteration);
+			printf("\allele: %i\n", allele);
+			//counter = 0;
+			for(counter = 0; counter < lettersPerIteration; counter++){//while(counter < lettersPerIteration){
+				printf("\t\tCounter: %i\n", counter);
+				row[iteration][letter] = progenitor1[(letter * 2) + (allele % 2)];
+				col[iteration][letter] = progenitor2[(letter * 2) + (allele % 2)];
+				iteration++;
+				//counter++;
+			}
+			allele++;
+		}
+		lettersPerIteration /= 2;
+	}
+	//Show rows and  columns
+	if(debug == 1){
+		printf("1: %s\n", progenitor1);
+		printf("2: %s\n", progenitor2);
+		printf("Cross:\n");
+		for(counter = 0; counter < tableSide; counter++){
+			printf("row: ");
+			for(allele = 0; allele < n; allele++){
+				printf("%c", row[counter][allele]);
+			}
+			putchar('\n');
+		}
+		for(counter = 0; counter < tableSide; counter++){
+			printf("column: ");
+			for(allele = 0; allele < n; allele++){
+				printf("%c", col[counter][allele]);
+			}
+			putchar('\n');
+		}
+	}
+
+	//Create offspring
 	for(counter = 0; counter < tableSide; counter++){
-		for(counter1 = 0; counter1 <tableSide; counter1++){
+		for(allele = 0; allele <tableSide; allele++){
 			for(letter = 0; letter < n; letter++){
-				offspring[counter][counter1][letter] = '1';
-				offspring[counter][counter1][n + letter] ='1'; 
+				offspring[allele][counter][2 * letter] = row[counter][letter];
+				offspring[allele][counter][2 * letter + 1] = col[allele][letter]; 
 			}
 		}
 	}
-	/*
-	alleles = 2 * n;
-	offspringAmount = pow(4, n);
 
-	int letter = 0;
-	int currentOffspring, allele, prog1, prog2;
-	char offspring[offspringAmount][alleles];
-	
-	int tableSide = pow(2, n);
-
-	//for(letter = 0; letter < n; letter++){
-		currentOffspring = 0;
-		while(currentOffspring < offspringAmount){
-			for(allele = 0; allele < n; allele++){
-				//value = pow(2, n - allele);
-				printf("%i\n", value);
-				printf("%i\n", currentOffspring / tableSide);
-				prog1 = (2 * allele) + currentOffspring % 2;
-				prog2 = (2 * allele) + currentOffspring / tableSide;
-
-				offspring[currentOffspring][allele] = progenitor1[prog1];
-				offspring[currentOffspring][n + allele] = progenitor2[prog2];
-
-				printf("1-%i: %i - %c   ", allele, prog1, progenitor1[prog1]);
-				printf("2-%i: %i - %c   ;", allele, prog2, progenitor2[prog2]);
+	//Show offspring
+	if(debug == 1){
+		for(counter = 0; counter < tableSide; counter++){
+			for(allele = 0; allele <tableSide; allele++){
+				for(letter = 0; letter < n*2; letter++){
+					putchar(offspring[counter][allele][letter]);
+				}
+				putchar(' ');
 			}
 			putchar('\n');
-			currentOffspring++;
-		}*/
-	//}
+		}
+	}
+	
 	char expected[16][4] = {"ABCD", "AbCD", "aBCD", "abCD", "ABCd", "AbCd", "aBCd", "abCd", "ABcD", "AbcD", "aBcD","abcD", "ABcd", "Abcd", "aBcd", "abcd"};
-	/*
-	for(currentOffspring = 0; currentOffspring < offspringAmount; currentOffspring++){
-		printf("%c", expected[currentOffspring][0]);
-		printf("%c - ", expected[currentOffspring][1]);
-		//printf("%c", expected[currentOffspring][2]);
-		//printf("%c - ", expected[currentOffspring][3]);
-
-		printf("%c", offspring[currentOffspring][0]);
-		printf("%c\n", offspring[currentOffspring][1]);
-		//printf("%c", offspring[currentOffspring][2]);
-		//printf("%c\n", offspring[currentOffspring][3]); 
-	}*/
+	
 }
 
 int main(int argc, char *arcgv[]){
 	int letter = 0;
-	char caps[5] = {'A','B','C','D','E'};
-
 	char genotypes[n][3][2];
 
-	printf("Base genotypes:\n");
+	if(debug == 1) { printf("Base genotypes:\n"); }
 	for(letter; letter < n; letter++){
 		genotypes[letter][0][0] = caps[letter];
 		genotypes[letter][0][1] = caps[letter];
@@ -134,23 +108,25 @@ int main(int argc, char *arcgv[]){
 		genotypes[letter][2][0] = tolower(caps[letter]);
 		genotypes[letter][2][1] = tolower(caps[letter]);
 		
-		printf("%c", genotypes[letter][0][0]);
-		printf("%c\n", genotypes[letter][0][1]);
+		if(debug == 1) {
+			printf("%c", genotypes[letter][0][0]);
+			printf("%c\n", genotypes[letter][0][1]);
 
-		printf("%c", genotypes[letter][1][0]);
-		printf("%c\n", genotypes[letter][1][1]);
+			printf("%c", genotypes[letter][1][0]);
+			printf("%c\n", genotypes[letter][1][1]);
 
-		printf("%c", genotypes[letter][2][0]);
-		printf("%c\n", genotypes[letter][2][1]);
+			printf("%c", genotypes[letter][2][0]);
+			printf("%c\n", genotypes[letter][2][1]);
+		}
 	}
 
-	printf("Mixed Genotypes:\n");
+	//printf("Mixed Genotypes:\n");
 
 	int genotype = 0;
 	int genotypeRepetition = 0;
 	int currentGenotype = 0;
 	int genotypeAmount = pow(3, n);
-	printf("Mixed Genotype Amount: %i\n", genotypeAmount);
+	//printf("Mixed Genotype Amount: %i\n", genotypeAmount);
 	char possibleGenotypes[genotypeAmount][(2 * n) + 1];
 
 	for(letter = 0; letter < n; letter++){
@@ -175,5 +151,5 @@ int main(int argc, char *arcgv[]){
 	}
 
 
-	cross("AaBb", "CcDd");	
+	cross("AaBbCc", "AaBbCc");
 }
