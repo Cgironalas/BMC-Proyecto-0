@@ -22,7 +22,8 @@ void cross(char* progenitor1, char* progenitor2){
 	char col[tableSide][n];
 	int counter, iteration, allele, letter;
 
-	char offspring[tableSide][tableSide][2 * n];
+	int genes = (2 * n);
+	char offspring[tableSide][tableSide][genes + 1];
 
 
 	//Create rows and columns
@@ -73,6 +74,7 @@ void cross(char* progenitor1, char* progenitor2){
 				offspring[allele][counter][2 * letter] = row[counter][letter];
 				offspring[allele][counter][2 * letter + 1] = col[allele][letter]; 
 			}
+			offspring[allele][counter][genes] = '\0';
 		}
 	}
 
@@ -80,9 +82,10 @@ void cross(char* progenitor1, char* progenitor2){
 	if(debug == 1){
 		for(counter = 0; counter < tableSide; counter++){
 			for(allele = 0; allele <tableSide; allele++){
-				for(letter = 0; letter < n*2; letter++){
-					putchar(offspring[counter][allele][letter]);
-				}
+				//for(letter = 0; letter < n*2; letter++){
+				//	putchar(offspring[counter][allele][letter]);
+				//}
+				printf("%s", offspring[counter][allele]);
 				putchar(' ');
 			}
 			putchar('\n');
