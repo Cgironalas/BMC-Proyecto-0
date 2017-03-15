@@ -18,8 +18,8 @@ void cross(char* progenitor1, char* progenitor2){
 	printf("Table side: %i\n", tableSide);
 	printf("lettersPerIteration: %i\n\n", lettersPerIteration);
 
-	char row[tableSide][n];
-	char col[tableSide][n];
+	char row[tableSide][n + 1];
+	char col[tableSide][n + 1];
 	int counter, iteration, allele, letter;
 
 	int genes = (2 * n);
@@ -46,24 +46,20 @@ void cross(char* progenitor1, char* progenitor2){
 		}
 		lettersPerIteration /= 2;
 	}
+	for(counter = 0; counter < tableSide; counter++){
+		row[counter][n] = '\0';
+		col[counter][n] = '\0';
+	}
 	//Show rows and  columns
 	if(debug == 1){
 		printf("1: %s\n", progenitor1);
 		printf("2: %s\n", progenitor2);
 		printf("Cross:\n");
 		for(counter = 0; counter < tableSide; counter++){
-			printf("row: ");
-			for(allele = 0; allele < n; allele++){
-				printf("%c", row[counter][allele]);
-			}
-			putchar('\n');
+			printf("row: %s\n", row[counter]);
 		}
 		for(counter = 0; counter < tableSide; counter++){
-			printf("column: ");
-			for(allele = 0; allele < n; allele++){
-				printf("%c", col[counter][allele]);
-			}
-			putchar('\n');
+			printf("column: %s\n", col[counter]);
 		}
 	}
 
