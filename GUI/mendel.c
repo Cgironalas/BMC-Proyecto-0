@@ -12,8 +12,14 @@ GtkWidget       *windowFinalTable;
 GtkWidget       *windowsParentsData;
 GtkWidget       ***tableData;
 GtkWidget       ***tableFinalData;
+GtkWidget       ***tableGeoData;
+GtkWidget       ***tableFeoData;
+
 GtkWidget 			*g_tableData;
 GtkWidget       *g_tableFinalData;
+GtkWidget       *g_tableGeo;
+GtkWidget       *g_tableFeo;
+
 GtkWidget       *g_frame_manualEntry;
 GtkWidget       *g_frame_fileEntry;
 GtkWidget       *g_filechooser_btn;
@@ -29,6 +35,8 @@ GtkWidget       *g_scrolledwindows_parents;
 GtkWidget       *g_scrolledwindow_parentsData1;
 GtkWidget       *g_scrolledwindows_first;
 GtkWidget       *g_scrolledwindows_second;
+GtkWidget       *g_scrolledwindow_finalTableGeno;
+GtkWidget       *g_scrolledwindow_finalTableFeno;
 int tableSide;
 FILE 						*file_tableData;
 
@@ -71,7 +79,8 @@ int main() {
     windowFinalTable = GTK_WIDGET(gtk_builder_get_object(builder, "window_finalTable"));
  gtk_builder_connect_signals(builder, NULL);
  g_scrolledwindow_finalTable = GTK_WIDGET(gtk_builder_get_object(builder, "scrolledwindow_finalTable"));
-
+ g_scrolledwindow_finalTableGeno = GTK_WIDGET(gtk_builder_get_object(builder,"scrolledwindow_finalTableGeno"));
+g_scrolledwindow_finalTableFeno = GTK_WIDGET(gtk_builder_get_object(builder,"scrolledwindow_finalTableFeno"));
     g_scrolledwindow_initialTableData = GTK_WIDGET(gtk_builder_get_object(builder, "scrolledwindow_initialTableData"));
 
     g_scrolledwindows_parents = GTK_WIDGET(gtk_builder_get_object(builder, "scrolledwindow_parentsData"));
@@ -123,9 +132,89 @@ void on_window_finalTable_destroy() {
   gtk_main_quit();
 }
 
+
+
 void test(GtkWidget *widget,int * num)
 {
   printf("Cree un mostruo %d?\n",num);
+}
+
+void createGeoTable(int totalGen, genotypeCount list[2000]){
+  tableGeoData = calloc(totalGen,sizeof(GtkWidget**));
+
+    g_tableGeo = gtk_grid_new ();
+    gtk_container_add (GTK_CONTAINER (g_scrolledwindow_finalTableGeno), g_tableGeo);
+
+    for(int j = 0; j < tableSide+2; j++) {
+      tableGeoData[j] = calloc(strlen(list[0].name)+1,sizeof(GtkWidget*));
+    }
+
+    for(int row =0; row < totalGen; row++)
+    {
+      for(int column=0; column < 2; column++)
+      {
+        tableGeoData[row][column] = gtk_entry_new();
+        gtk_entry_set_width_chars(GTK_ENTRY(tableGeoData[row][column]),strlen(list[0].name) +1);
+        gtk_widget_set_sensitive(tableGeoData[row][column],FALSE);
+        gtk_grid_attach (GTK_GRID (g_tableGeo),tableGeoData[row][column] , column, row, 1, 1);
+        if (column==0){
+          gtk_entry_set_text (GTK_ENTRY(tableGeoData[row][column]),list[row].name);
+          gtk_widget_set_name(tableGeoData[row][column],"rowHeader");
+
+        }
+        else{
+          char str[strlen(list[0].name)+1];
+          sprintf(str, "%d", list[row].total);
+          gtk_entry_set_text (GTK_ENTRY(tableGeoData[row][column]),str);
+          gtk_widget_set_name(tableGeoData[row][column],"rowHeader");
+        }
+      }
+
+    }
+    gtk_widget_set_sensitive(tableGeoData[0][0],FALSE);
+    gtk_widget_set_name(tableGeoData[0][0],"rowHeader");
+
+}
+
+void createFeoTable(int totalGen, fenotypeCount listF[2000]){
+  tableFeoData = calloc(totalGen,sizeof(GtkWidget**));
+
+    g_tableFeo = gtk_grid_new ();
+    gtk_container_add (GTK_CONTAINER (g_scrolledwindow_finalTableFeno), g_tableFeo);
+
+    for(int j = 0; j < tableSide+2; j++) {
+      tableFeoData[j] = calloc(strlen(listF[0].name)+1,sizeof(GtkWidget*));
+    }
+
+    for(int row =0; row < totalGen; row++)
+    {
+      for(int column=0; column < 2; column++)
+      {
+        tableFeoData[row][column] = gtk_entry_new();
+        gtk_entry_set_width_chars(GTK_ENTRY(tableFeoData[row][column]),strlen(listF[0].name) +1);
+        gtk_widget_set_sensitive(tableFeoData[row][column],FALSE);
+        gtk_grid_attach (GTK_GRID (g_tableFeo),tableFeoData[row][column] , column, row, 1, 1);
+        if (column==0){
+          gtk_entry_set_text (GTK_ENTRY(tableFeoData[row][column]),listF[row].name);
+          gtk_widget_set_name(tableFeoData[row][column],"rowHeader");
+        }
+        else{
+
+         char str[strlen(listF[0].name)+1];
+          sprintf(str, "%d", listF[row].total);
+          gtk_entry_set_text (GTK_ENTRY(tableFeoData[row][column]),str);
+          gtk_widget_set_name(tableFeoData[row][column],"rowHeader");
+
+
+        }
+}
+
+    }
+
+
+    gtk_widget_set_sensitive(tableFeoData[0][0],FALSE);
+    gtk_widget_set_name(tableFeoData[0][0],"rowHeader");
+
 }
 
 void createFinalTable(char offspring[tableSide][tableSide][2 * (totalCharacteristic-1)+1],int knapsackCapacity,
@@ -166,9 +255,14 @@ char headerRow[tableSide][totalCharacteristic],char headerCol[tableSide][totalCh
     gtk_widget_set_sensitive(tableFinalData[0][0],FALSE);
     gtk_widget_set_name(tableFinalData[0][0],"rowHeader");
     gtk_widget_show_all(windowFinalTable);
+    //gtk_widget_hide(windowsParentsData);
+
 
 }
 
+void active_button(){
+
+}
 
 
 void btn_cross_clicked(){
@@ -183,26 +277,18 @@ void btn_cross_clicked(){
   char col[tableSide][totalCharacteristic];
   int genes = 2 * (totalCharacteristic-1);
   char offspring[tableSide][tableSide][genes+1];
-
+  genotypeCount listGenotype[2000];
+  fenotypeCount listFenotype[2000];
   cross(parent1,parent2,totalCharacteristic-1,tableSide,row,col,genes,offspring);
-  //cross(parent1,parent2,totalCharacteristic-1,tableSide,row,col,offspring);
-  int counter,allele;
-  for(counter = 0; counter < tableSide; counter++){
-    for(allele = 0; allele <tableSide; allele++){
-      //for(letter = 0; letter < n*2; letter++){
-      //	putchar(offspring[counter][allele][letter]);
-      //}
-      printf("%s", offspring[counter][allele]);
-      putchar(' ');
-    }
-    putchar('\n');
-  }
+  int numberGenotype = genotypeInterpretation(listGenotype,genes,tableSide,offspring);
+  int numberFenotype = fenotypeInterpretation(poolInitial,totalCharacteristic-1,listFenotype,genes,tableSide,offspring);
 
-//  printf("%s\n",row[0][0]);
 
+  createFeoTable(numberFenotype,listFenotype);
+  createGeoTable(numberGenotype,listGenotype);
   createFinalTable(offspring,genes+1,row,col);
-  //gtk_widget_hide(windowTableData);
-  //gtk_widget_show_now(windowFinalTable);
+
+//  gtk_widget_show_now(windowFinalTable);
 
 }
 
@@ -261,16 +347,16 @@ void createTableData() {
 
 void createTableDataFile(char Matriz[totalCharacteristic][4][25]){
 
-  tableData = calloc(totalCharacteristic+1,sizeof(GtkWidget**));
+  tableData = calloc(totalCharacteristic,sizeof(GtkWidget**));
 
   g_tableData = gtk_grid_new ();
   gtk_container_add (GTK_CONTAINER (g_scrolledwindow_initialTableData), g_tableData);
 
-  for(int j = 0; j < totalCharacteristic+1; j++) {
+  for(int j = 0; j < totalCharacteristic; j++) {
     tableData[j] = calloc(4,sizeof(GtkWidget*));
   }
 
-  for(int row =0; row < totalCharacteristic+1; row++)
+  for(int row =0; row < totalCharacteristic; row++)
   {
     for(int column=0; column < 4; column++)
     {
@@ -338,7 +424,7 @@ void on_btn_getEntries_clicked() {
 
 void on_btn_getFile_clicked() {
 
-  totalCharacteristic = countObjectsFiles (gtk_file_chooser_get_filename (GTK_FILE_CHOOSER(g_filechooser_btn)));
+  totalCharacteristic = countObjectsFiles (gtk_file_chooser_get_filename (GTK_FILE_CHOOSER(g_filechooser_btn))) + 1;
   char matrizD[totalCharacteristic][4][25];
   fillTable(gtk_file_chooser_get_filename (GTK_FILE_CHOOSER(g_filechooser_btn)),matrizD);
 
@@ -361,6 +447,8 @@ void on_radioButtonSecond_clicked(GtkButton *button){
 
 
 void createParentsTable(int genotypeAmount,char possibleGenotypes[genotypeAmount][(2 * totalCharacteristic-1) + 1]){
+  int set1=0;
+  int set2=0;
   GtkWidget *radio1;
   GtkWidget *radio2;
   GtkWidget *vbox1;
@@ -374,13 +462,23 @@ void createParentsTable(int genotypeAmount,char possibleGenotypes[genotypeAmount
     radio2 =  gtk_radio_button_new_with_label(group2, possibleGenotypes[i]);
     char name[9+26*(totalCharacteristic-1)];
     getFenotype(poolInitial,totalCharacteristic-1,possibleGenotypes[i],name);
-
     group1 = gtk_radio_button_get_group(GTK_RADIO_BUTTON(radio1));
     group2 = gtk_radio_button_get_group(GTK_RADIO_BUTTON(radio2));
     gtk_box_pack_start(GTK_BOX(vbox1), radio1, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(vbox2), radio2, FALSE, FALSE, 0);
     gtk_widget_set_tooltip_text(radio1, name);
+    if (set1==0){
+      const gchar *text = gtk_button_get_label (radio1);
+      gtk_entry_set_text(GTK_ENTRY(g_scrolledwindows_first),text);
+      set1=0;
+    }
     gtk_widget_set_tooltip_text(radio2, name);
+    if (set2==0){
+      const gchar *text = gtk_button_get_label (radio2);
+      gtk_entry_set_text(GTK_ENTRY(g_scrolledwindows_second),text);
+
+      set2=1;
+    }
     g_signal_connect(G_OBJECT(GTK_RADIO_BUTTON(radio1)),"clicked",G_CALLBACK(on_radioButtonFirst_clicked),radio1);
     g_signal_connect(G_OBJECT(GTK_RADIO_BUTTON(radio2)),"clicked",G_CALLBACK(on_radioButtonSecond_clicked),radio2);
     gtk_widget_show(radio1);

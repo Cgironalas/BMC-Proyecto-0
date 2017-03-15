@@ -1,3 +1,5 @@
+
+
 int totalObjectsCount = 0;
 FILE * fileTableData;
 char buffer[25];
@@ -7,6 +9,19 @@ typedef struct{
   char dominant[25];
   char recesive[25];
 }dataInformation;
+
+typedef struct{
+  int total;
+  char name [500];
+} genotypeCount;
+
+typedef struct{
+  int total;
+  char name [27*3*25];
+} fenotypeCount;
+
+int d=0;
+
 
 char origin[27] = {'A','B','C','D','E','F','G','H','I','J','K','L','M','N','Ñ','O','P','Q','R','S','T','U','V','W','X','Y','Z'};
 
@@ -93,7 +108,7 @@ dataInformation getGenInformation(dataInformation initialPool[27],int size,int p
 char  getFenotype(dataInformation initialPool[27],int size,char genotype[size*2],char name[9+26*size] ){
   int i =0;
   int limit = size *2;
-  strcpy(name,"FENOTIPO:");
+  strcpy(name,"");
   for (i;i<limit;i=i+2){
     int pos = getLetterPosition(genotype[i]);
     dataInformation gen = getGenInformation(initialPool,size,pos);
@@ -106,11 +121,13 @@ char  getFenotype(dataInformation initialPool[27],int size,char genotype[size*2]
       strncat(name,gen.recesive,25);
       strncat(name,",",1);
     }
-
   }
+  if(d == 1){
+    printf("%s\n",name);
+  }
+
   return name;
 }
-
 
 void cross(char* progenitor1, char* progenitor2,int n,int tableSide,char row[tableSide][n+1],
 	char col[tableSide][n+1],int genes,char offspring[tableSide][tableSide][genes + 1]){
@@ -197,6 +214,7 @@ void cross(char* progenitor1, char* progenitor2,int n,int tableSide,char row[tab
 }
 
 
+
 /*Read Files*/
 void fillBuffer(int _val) {
 	if (strlen(buffer) == 0) {
@@ -263,9 +281,86 @@ void setMatriz(char matrizD[totalObjectsCount][4][25]) {
 }
 
 void fillTable (char * address,char  matrizD[totalObjectsCount][4][25]){
-  fileTableData = fopen("prueba.cvs","r");
+  fileTableData = fopen(address,"r");
   setMatriz(matrizD);
   }
+
+int genotypeInterpretation(genotypeCount listGenotype[2000],int genes,int tableSide,char offspring[tableSide][tableSide][genes + 1]){
+  int counter = 0;
+  for (int i=0;i<tableSide;i++){
+    for (int j =0;j<tableSide;j++){
+      genotypeCount actual;
+      if (counter == 0){
+        strcpy(actual.name,offspring[i][j]);
+        actual.total = 1;
+        listGenotype[counter] = actual;
+        counter ++;
+        //printf("HERE in counter 0\n");
+      }
+      else{
+        int found = 0;
+        for (int x=0;x<counter;x++){
+          if (strcmp(listGenotype[x].name,offspring[i][j])==0){
+            listGenotype[x].total = listGenotype[x].total +1;
+            found = 1;
+            break;
+          }
+        }
+        if (found == 0){
+          strcpy(actual.name,offspring[i][j]);
+          actual.total = 1;
+          listGenotype[counter] = actual;
+          counter ++;
+
+
+        }
+                    }
+        }
+      }
+  return counter;
+}
+
+int fenotypeInterpretation(dataInformation initialPool[27],int size ,fenotypeCount listFenotype[2000],int genes,int tableSide,char offspring[tableSide][tableSide][genes + 1]){
+d = 0;
+
+  int counter = 0;
+
+  for (int i=0;i<tableSide;i++){
+    for (int j =0;j<tableSide;j++){
+      char name[9+26*size];
+      fenotypeCount actual;
+      if (counter == 0){
+        getFenotype(initialPool,size,offspring[i][j],name);
+        printf("%s\n",name);
+        strcpy(actual.name,name);
+        actual.total = 1;
+        listFenotype[counter] = actual;
+        counter ++;
+      }
+      else{
+        int found = 0;
+        for (int x=0;x<counter;x++){
+          getFenotype(initialPool,size,offspring[i][j],name);
+          if (strcmp(listFenotype[x].name,name)==0){
+            listFenotype[x].total = listFenotype[x].total +1;
+            found = 1;
+            break;
+          }
+        }
+        if (found == 0){
+          getFenotype(initialPool,size,offspring[i][j],name);
+          strcpy(actual.name,name);
+          actual.total = 1;
+          listFenotype[counter] = actual;
+          counter ++;
+          //printf("HERE because is distinc\n");
+
+        }
+                    }
+        }
+      }
+  return counter;
+}
 
 
 
