@@ -129,7 +129,7 @@ void test(GtkWidget *widget,int * num)
 }
 
 void createFinalTable(char offspring[tableSide][tableSide][2 * (totalCharacteristic-1)+1],int knapsackCapacity,
-char headerRow[tableSide][totalCharacteristic-1],char headerCol[tableSide][totalCharacteristic-1]) {
+char headerRow[tableSide][totalCharacteristic],char headerCol[tableSide][totalCharacteristic]) {
   tableFinalData = calloc(tableSide+1,sizeof(GtkWidget**));
 
     g_tableFinalData = gtk_grid_new ();
@@ -152,7 +152,6 @@ char headerRow[tableSide][totalCharacteristic-1],char headerCol[tableSide][total
           gtk_widget_set_name(tableFinalData[row][column],"rowHeader");
         }
         if(column!=0 && row ==0){
-
             gtk_entry_set_text (GTK_ENTRY(tableFinalData[row][column]),headerRow[column-1]);
             gtk_widget_set_name(tableFinalData[row][column],"rowHeader");
         }
@@ -188,7 +187,6 @@ void btn_cross_clicked(){
   cross(parent1,parent2,totalCharacteristic-1,tableSide,row,col,genes,offspring);
   //cross(parent1,parent2,totalCharacteristic-1,tableSide,row,col,offspring);
   int counter,allele;
-  printf("%d\n",tableSide );
   for(counter = 0; counter < tableSide; counter++){
     for(allele = 0; allele <tableSide; allele++){
       //for(letter = 0; letter < n*2; letter++){
